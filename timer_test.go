@@ -33,6 +33,12 @@ func TestRepeatBlock(t *testing.T) {
 	go tr.Block(time.Second * 5)
 	// time.Sleep(time.Second * 1)
 	go tr.Block(time.Second * 5)
+
+	time.Sleep(time.Second * 1)
+	log.Println(tr.GeDuration())
+	time.Sleep(time.Second * 1)
+	log.Println(tr.GeDuration())
+
 	time.Sleep(time.Second * 6)
 }
 
@@ -42,4 +48,22 @@ func TestCancel(t *testing.T) {
 	time.Sleep(time.Second * 3)
 	tr.Cancel()
 	time.Sleep(time.Second * 3)
+}
+
+func TestGetDuration(t *testing.T) {
+	tr := NewTimer()
+	go tr.Block(time.Second * 5)
+	time.Sleep(time.Millisecond * 500)
+	log.Println(tr.GeDuration())
+	time.Sleep(time.Millisecond * 700)
+	log.Println(tr.GeDuration())
+	time.Sleep(time.Millisecond * 900)
+	log.Println(tr.GeDuration())
+	go tr.Block(time.Second * 5)
+	time.Sleep(time.Millisecond * 500)
+	log.Println(tr.GeDuration())
+	time.Sleep(time.Millisecond * 700)
+	log.Println(tr.GeDuration())
+	time.Sleep(time.Millisecond * 900)
+	log.Println(tr.GeDuration())
 }

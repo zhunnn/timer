@@ -6,18 +6,19 @@ import (
 )
 
 type Timer struct {
-	isPause      bool
-	isCancel     *bool
-	mu           *sync.Mutex
-	intervalTime time.Duration
+	isPause   bool
+	isCancel  *bool
+	mu        *sync.Mutex
+	frequency time.Duration
+	duration  time.Duration
 }
 
 func NewTimer() *Timer {
 	t := &Timer{
-		isPause:      false,
-		mu:           &sync.Mutex{},
-		isCancel:     new(bool),
-		intervalTime: time.Second,
+		isPause:   false,
+		mu:        &sync.Mutex{},
+		isCancel:  new(bool),
+		frequency: time.Millisecond,
 	}
 	return t
 }
@@ -33,11 +34,12 @@ func (t *Timer) Block(duration time.Duration) {
 	t.isCancel = myCancel
 	// 移除暫停
 	t.isPause = false
+	t.duration = duration
 	t.mu.Unlock()
 
 	// 每毫秒倒計時
 	// log.Println("start")
-	tr := time.NewTicker(t.intervalTime)
+	tr := time.NewTicker(t.frequency)
 	defer tr.Stop()
 
 	// 毫秒迴圈
@@ -53,18 +55,13 @@ func (t *Timer) Block(duration time.Duration) {
 			continue
 		}
 		// 結束
-		if duration <= 0 {
+		if t.duration <= 0 {
 			// log.Println("done")
 			return
 		}
 		// log.Println("tr")
-		duration -= t.intervalTime
+		t.duration -= t.frequency
 	}
-}
-
-// 設定間隔時間
-func (t *Timer) SetIntervalTime(it time.Duration) {
-	t.intervalTime = it
 }
 
 // 暫停計時器
@@ -75,4 +72,14 @@ func (t *Timer) Pause() {
 // 刪除計時器
 func (t *Timer) Cancel() {
 	*t.isCancel = true
+}
+
+// 設定倒計時頻率
+func (t *Timer) SetFrequency(fq time.Duration) {
+	t.frequency = fq
+}
+
+// 取得剩餘時間
+func (t *Timer) GeDuration() time.Duration {
+	return t.duration
 }
